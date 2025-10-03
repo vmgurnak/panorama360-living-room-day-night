@@ -197,9 +197,14 @@
          setTimeout(() => viewer.loadScene(scene), 600);
       }
 
+      // function addMobileClick(el, fn) {
+      //    el.addEventListener('click', fn);
+      //    el.addEventListener('touchstart', e => { e.preventDefault(); fn(); });
+      // }
+
       function addMobileClick(el, fn) {
          el.addEventListener('click', fn);
-         el.addEventListener('touchstart', e => { e.preventDefault(); fn(); });
+         el.addEventListener('touchend', e => { e.preventDefault(); fn(); });
       }
 
       addMobileClick(document.getElementById('dayBtn'), () => switchLighting('day'));
