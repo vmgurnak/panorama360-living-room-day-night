@@ -65,7 +65,7 @@
       }
 
       #controls button:hover {
-         background: rgba(255, 255, 255, 1);
+         background: rgba(255, 255, 255, 0.4);
          transform: scale(1.05);
       }
 
@@ -73,6 +73,8 @@
          width: 20px;
          height: 20px;
          fill: #000;
+         display: block;
+         margin: auto;
       }
 
       /* Панель День/Ночь слева */
@@ -131,35 +133,25 @@
    <div id="lightOverlay"></div>
 
    <!-- Правая панель -->
-   <!-- <div id="controls">
-      <button id="up">⬆</button>
-      <button id="down">⬇</button>
-      <button id="left">⬅</button>
-      <button id="right">➡</button>
-      <button id="zoomIn">＋</button>
-      <button id="zoomOut">－</button>
-      <button id="fs">⛶</button>
-   </div> -->
-
    <div id="controls">
-      <button id="up" aria-label="Вверх">
+      <button id="up" aria-label="Up">
          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M12 4l-8 8h16z" />
+            <path d="M7 14l5-5 5 5z" />
          </svg>
       </button>
-      <button id="down" aria-label="Вниз">
+      <button id="down" aria-label="Down">
          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M12 20l8-8H4z" />
+            <path d="M7 10l5 5 5-5z" />
          </svg>
       </button>
-      <button id="left" aria-label="Влево">
+      <button id="left" aria-label="Left">
          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M4 12l8-8v16z" />
+            <path d="M14 7l-5 5 5 5z" />
          </svg>
       </button>
-      <button id="right" aria-label="Вправо">
+      <button id="right" aria-label="Right">
          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M20 12l-8-8v16z" />
+            <path d="M10 7l5 5-5 5z" />
          </svg>
       </button>
       <button id="zoomIn">＋</button>
