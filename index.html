@@ -3,7 +3,7 @@
 
 <head>
    <meta charset="utf-8">
-   <title>360 Panorama Day/Night</title>
+   <title>360 Panorama Day/Night Smooth</title>
    <meta name="viewport" content="width=device-width,initial-scale=1">
    <link rel="stylesheet" href="https://cdn.pannellum.org/2.5/pannellum.css" />
    <style>
@@ -13,6 +13,7 @@
          height: 100%;
          overflow: hidden;
          background: #000;
+         touch-action: manipulation;
       }
 
       #panorama {
@@ -20,7 +21,21 @@
          height: 100vh;
       }
 
-      /* Панель управления (справа) */
+      /* Overlay для плавного изменения света */
+      #lightOverlay {
+         position: absolute;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;
+         background: rgba(0, 0, 0, 0);
+         /* прозрачный для дня */
+         pointer-events: none;
+         z-index: 15;
+         transition: background 1.2s ease;
+      }
+
+      /* Правая панель */
       #controls {
          position: absolute;
          top: 50%;
@@ -42,15 +57,19 @@
          border-radius: 4px;
          cursor: pointer;
          font-size: 16px;
-         width: 40px;
-         height: 40px;
+         width: 44px;
+         height: 44px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
       }
 
       #controls button:hover {
          background: rgba(255, 255, 255, 1);
+         transform: scale(1.05);
       }
 
-      /* Панель День/Ночь */
+      /* Панель День/Ночь слева */
       #dayNightControls {
          position: absolute;
          top: 10px;
@@ -85,27 +104,27 @@
          fill: #000;
       }
 
-      /* Затемняющий слой для плавного перехода */
-      #fadeLayer {
-         position: absolute;
-         top: 0;
-         left: 0;
-         width: 100%;
-         height: 100%;
-         background: rgba(0, 0, 0, 0.7);
-         opacity: 0;
-         pointer-events: none;
-         transition: opacity 0.8s ease;
-         z-index: 15;
+      @media (max-width: 768px) {
+
+         #controls button,
+         .dayNightControls button {
+            width: 50px;
+            height: 50px;
+         }
+
+         .dayNightControls svg {
+            width: 24px;
+            height: 24px;
+         }
       }
    </style>
 </head>
 
 <body>
    <div id="panorama"></div>
-   <div id="fadeLayer"></div>
+   <div id="lightOverlay"></div>
 
-   <!-- Панель управления справа -->
+   <!-- Правая панель -->
    <div id="controls">
       <button id="up">⬆</button>
       <button id="down">⬇</button>
@@ -116,17 +135,15 @@
       <button id="fs">⛶</button>
    </div>
 
-   <!-- Панель День/Ночь слева -->
+   <!-- Панель День/Ночь -->
    <div id="dayNightControls" class="dayNightControls">
       <button id="dayBtn" title="День">
-         <!-- SVG солнца -->
          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path
                d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.8 1.42-1.42zm10.48 0l1.8-1.79 1.41 1.41-1.79 1.8-1.42-1.42zM12 4V1h-1v3h1zm0 19v-3h-1v3h1zm8-9h3v-1h-3v1zm-19 0h3v-1H1v1zm15.66 6.66l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zm-11.31 0l-1.8 1.8 1.41 1.41 1.8-1.8-1.41-1.41zM12 7a5 5 0 100 10 5 5 0 000-10z" />
          </svg>
       </button>
       <button id="nightBtn" title="Ночь">
-         <!-- SVG луны -->
          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path
                d="M9.37 5.51A7 7 0 0012 19a7 7 0 006.49-9.16 0.5 0.5 0 01.72-.59A9 9 0 1111.1 4.79a0.5 0.5 0 01-.59.72c-.4.16-.78.36-1.14.6z" />
@@ -137,52 +154,43 @@
    <script src="https://cdn.pannellum.org/2.5/pannellum.js"></script>
    <script>
       const viewer = pannellum.viewer('panorama', {
-         "default": {
-            "firstScene": "day",
-            "hfov": 100,
-            "orientationOnByDefault": true,
-            "showControls": false,
-            "autoRotate": 0
-         },
-         "scenes": {
-            "day": {
-               "type": "equirectangular",
-               "panorama": "pano_day.webp",
-               "autoLoad": true
-            },
-            "night": {
-               "type": "equirectangular",
-               "panorama": "pano_night.webp"
-            }
+         default: { firstScene: "day", hfov: 100, orientationOnByDefault: true, showControls: false, autoRotate: 0 },
+         scenes: {
+            day: { type: "equirectangular", panorama: "pano_day.webp", autoLoad: true },
+            night: { type: "equirectangular", panorama: "pano_night.webp" }
          }
       });
 
-      const fadeLayer = document.getElementById('fadeLayer');
+      const overlay = document.getElementById('lightOverlay');
 
-      function switchScene(scene) {
-         fadeLayer.style.opacity = 1;
-         setTimeout(() => {
-            viewer.loadScene(scene);
-            fadeLayer.style.opacity = 0;
-         }, 600); // чуть быстрее, плавность
+      // Функция плавного перехода освещения
+      function switchLighting(scene) {
+         if (scene === 'night') {
+            overlay.style.background = 'rgba(0,0,50,0.35)'; // полутемно-синий
+         } else {
+            overlay.style.background = 'rgba(0,0,0,0)'; // день
+         }
+         setTimeout(() => viewer.loadScene(scene), 600);
       }
 
-      document.getElementById('dayBtn').onclick = () => switchScene('day');
-      document.getElementById('nightBtn').onclick = () => switchScene('night');
+      function addMobileClick(el, fn) {
+         el.addEventListener('click', fn);
+         el.addEventListener('touchstart', e => { e.preventDefault(); fn(); });
+      }
 
-      // Функции управления (панель справа)
-      document.getElementById('up').addEventListener('click', () => viewer.setPitch(viewer.getPitch() - 10));
-      document.getElementById('down').addEventListener('click', () => viewer.setPitch(viewer.getPitch() + 10));
-      document.getElementById('left').addEventListener('click', () => viewer.setYaw(viewer.getYaw() - 10));
-      document.getElementById('right').addEventListener('click', () => viewer.setYaw(viewer.getYaw() + 10));
-      document.getElementById('zoomIn').addEventListener('click', () => viewer.setHfov(viewer.getHfov() - 10));
-      document.getElementById('zoomOut').addEventListener('click', () => viewer.setHfov(viewer.getHfov() + 10));
-      document.getElementById('fs').addEventListener('click', () => {
-         if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
-         } else {
-            document.exitFullscreen();
-         }
+      addMobileClick(document.getElementById('dayBtn'), () => switchLighting('day'));
+      addMobileClick(document.getElementById('nightBtn'), () => switchLighting('night'));
+
+      // Панель управления
+      addMobileClick(document.getElementById('up'), () => viewer.setPitch(viewer.getPitch() - 10));
+      addMobileClick(document.getElementById('down'), () => viewer.setPitch(viewer.getPitch() + 10));
+      addMobileClick(document.getElementById('left'), () => viewer.setYaw(viewer.getYaw() - 10));
+      addMobileClick(document.getElementById('right'), () => viewer.setYaw(viewer.getYaw() + 10));
+      addMobileClick(document.getElementById('zoomIn'), () => viewer.setHfov(viewer.getHfov() - 10));
+      addMobileClick(document.getElementById('zoomOut'), () => viewer.setHfov(viewer.getHfov() + 10));
+      addMobileClick(document.getElementById('fs'), () => {
+         if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); }
+         else { document.exitFullscreen(); }
       });
    </script>
 </body>
