@@ -69,6 +69,12 @@
          transform: scale(1.05);
       }
 
+      #controls svg {
+         width: 20px;
+         height: 20px;
+         fill: #000;
+      }
+
       /* Панель День/Ночь слева */
       #dayNightControls {
          position: absolute;
@@ -125,11 +131,37 @@
    <div id="lightOverlay"></div>
 
    <!-- Правая панель -->
-   <div id="controls">
+   <!-- <div id="controls">
       <button id="up">⬆</button>
       <button id="down">⬇</button>
       <button id="left">⬅</button>
       <button id="right">➡</button>
+      <button id="zoomIn">＋</button>
+      <button id="zoomOut">－</button>
+      <button id="fs">⛶</button>
+   </div> -->
+
+   <div id="controls">
+      <button id="up" aria-label="Вверх">
+         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M12 4l-8 8h16z" />
+         </svg>
+      </button>
+      <button id="down" aria-label="Вниз">
+         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M12 20l8-8H4z" />
+         </svg>
+      </button>
+      <button id="left" aria-label="Влево">
+         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M4 12l8-8v16z" />
+         </svg>
+      </button>
+      <button id="right" aria-label="Вправо">
+         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M20 12l-8-8v16z" />
+         </svg>
+      </button>
       <button id="zoomIn">＋</button>
       <button id="zoomOut">－</button>
       <button id="fs">⛶</button>
