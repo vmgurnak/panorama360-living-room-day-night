@@ -21,7 +21,6 @@
          height: 100vh;
       }
 
-      /* Overlay для плавного изменения света */
       #lightOverlay {
          position: absolute;
          top: 0;
@@ -29,7 +28,6 @@
          width: 100%;
          height: 100%;
          background: rgba(0, 0, 0, 0);
-         /* прозрачный для дня */
          pointer-events: none;
          z-index: 15;
          transition: background 1.2s ease;
@@ -62,6 +60,7 @@
          display: flex;
          align-items: center;
          justify-content: center;
+         transition: background 0.2s, transform 0.2s;
       }
 
       #controls button:hover {
@@ -157,6 +156,7 @@
       <button id="zoomIn">＋</button>
       <button id="zoomOut">－</button>
       <button id="fs">⛶</button>
+      <button id="gyroBtn" title="Гироскоп">🧭</button>
    </div>
 
    <!-- Панель День/Ночь -->
@@ -187,26 +187,20 @@
 
       const overlay = document.getElementById('lightOverlay');
 
-      // Функция плавного перехода освещения
+      // Плавное переключение освещения
       function switchLighting(scene) {
-         if (scene === 'night') {
-            overlay.style.background = 'rgba(0,0,50,0.35)'; // полутемно-синий
-         } else {
-            overlay.style.background = 'rgba(0,0,0,0)'; // день
-         }
+         overlay.style.background = (scene === 'night')
+            ? 'rgba(0,0,50,0.35)'
+            : 'rgba(0,0,0,0)';
          setTimeout(() => viewer.loadScene(scene), 600);
       }
-
-      // function addMobileClick(el, fn) {
-      //    el.addEventListener('click', fn);
-      //    el.addEventListener('touchstart', e => { e.preventDefault(); fn(); });
-      // }
 
       function addMobileClick(el, fn) {
          el.addEventListener('click', fn);
          el.addEventListener('touchend', e => { e.preventDefault(); fn(); });
       }
 
+      // День / Ночь
       addMobileClick(document.getElementById('dayBtn'), () => switchLighting('day'));
       addMobileClick(document.getElementById('nightBtn'), () => switchLighting('night'));
 
@@ -218,9 +212,29 @@
       addMobileClick(document.getElementById('zoomIn'), () => viewer.setHfov(viewer.getHfov() - 10));
       addMobileClick(document.getElementById('zoomOut'), () => viewer.setHfov(viewer.getHfov() + 10));
       addMobileClick(document.getElementById('fs'), () => {
-         if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); }
-         else { document.exitFullscreen(); }
+         if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+         else document.exitFullscreen();
       });
+
+      // Гироскоп
+      let isGyroEnabled = false;
+      let deviceOrientationControl = null;
+
+      function toggleGyro() {
+         if (!isGyroEnabled) {
+            deviceOrientationControl = new pannellum.DeviceOrientationControlMethod();
+            viewer.addControlMethod('deviceOrientation', deviceOrientationControl);
+            isGyroEnabled = true;
+            document.getElementById('gyroBtn').style.background = 'rgba(0,255,0,0.3)'; // подсветка включено
+         } else {
+            viewer.removeControlMethod('deviceOrientation');
+            deviceOrientationControl = null;
+            isGyroEnabled = false;
+            document.getElementById('gyroBtn').style.background = 'rgba(255,255,255,0.8)';
+         }
+      }
+
+      addMobileClick(document.getElementById('gyroBtn'), toggleGyro);
    </script>
 </body>
 
